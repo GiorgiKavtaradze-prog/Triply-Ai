@@ -6,8 +6,7 @@ import {
   inngest,
 } from "@/inngest/client";
 
-// Minimal shape of the Clerk user webhook payloads (only the fields we use).
-// user.created / user.updated carry the full user; user.deleted only the id.
+
 type ClerkUserEvent = {
   type: string;
   data: {
@@ -27,7 +26,6 @@ export async function POST(request: Request) {
     return new Response("Missing CLERK_WEBHOOK_SIGNING_SECRET", { status: 500 });
   }
 
-  // svix needs the raw body + the three svix-* headers to verify the signature.
   const payload = await request.text();
   const svixId = request.headers.get("svix-id");
   const svixTimestamp = request.headers.get("svix-timestamp");
@@ -50,7 +48,6 @@ export async function POST(request: Request) {
 
   const data = event.data;
 
-  // Hand off to Inngest; the background functions do the DB writes.
   if (event.type === "user.created" || event.type === "user.updated") {
     const emails = data.email_addresses ?? [];
     const primaryEmail =

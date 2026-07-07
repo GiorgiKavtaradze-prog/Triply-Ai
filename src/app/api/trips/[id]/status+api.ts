@@ -3,8 +3,6 @@ import { db } from "@/db";
 import { trips } from "@/db/schema";
 import { getAuthUserId, unauthorized } from "@/lib/auth";
 
-// Lightweight polling endpoint for the loading screen. Returns just the trip's
-// generation status (+ error message on failure), scoped to the authenticated owner.
 export async function GET(request: Request, { id }: Record<string, string>) {
   const auth = await getAuthUserId(request);
   if (!auth.userId) return unauthorized(auth.reason);

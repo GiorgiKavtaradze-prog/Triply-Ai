@@ -101,11 +101,7 @@ export default function Profile() {
             if (!user) return;
             setIsDeleting(true);
             try {
-              // Deletes the Clerk user. Clerk then fires a `user.deleted` webhook,
-              // which our Inngest `syncUserDeleted` function consumes to remove the
-              // user row from Neon — cascades clear their trips, chats, and usage.
               await user.delete();
-              // Clear the local session/token cache so the layout redirects to sign-in.
               await signOut();
             } catch (error) {
               console.error("[profile] account deletion failed:", error);
@@ -124,17 +120,13 @@ export default function Profile() {
   return (
     <View className="flex-1 bg-white">
       <StatusBar style="dark" />
-
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: 120 }}
       >
-        {/* Title */}
         <Text className="px-6 text-4xl font-extrabold tracking-tight text-[#0F1B2D]">
           Profile
         </Text>
-
-        {/* User card */}
         <View className="mt-6">
           <Card>
             <View className="flex-row items-center px-4 py-4">
@@ -152,8 +144,6 @@ export default function Profile() {
             </View>
           </Card>
         </View>
-
-        {/* Stats card */}
         <View className="mt-4">
           <Card>
             <View className="flex-row items-center py-5">
@@ -174,24 +164,18 @@ export default function Profile() {
             </View>
           </Card>
         </View>
-
-        {/* Account */}
         <SectionHeader title="Account" />
         <Card>
           {ACCOUNT_ROWS.map((row, i) => (
             <Row key={row.label} icon={row.icon} label={row.label} isFirst={i === 0} />
           ))}
         </Card>
-
-        {/* Preferences */}
         <SectionHeader title="Preferences" />
         <Card>
           {PREFERENCE_ROWS.map((row, i) => (
             <Row key={row.label} icon={row.icon} label={row.label} isFirst={i === 0} />
           ))}
         </Card>
-
-        {/* Support */}
         <SectionHeader title="Support" />
         <Card>
           {SUPPORT_ROWS.map((row, i) => (
@@ -204,8 +188,6 @@ export default function Profile() {
             />
           ))}
         </Card>
-
-        {/* Log out */}
         <Pressable
           onPress={() => signOut()}
           className="mx-6 mt-6 flex-row items-center justify-center gap-2 rounded-[20px] border border-[#EDEFF3] bg-white py-4"
@@ -214,8 +196,6 @@ export default function Profile() {
           <SymbolView name="rectangle.portrait.and.arrow.right" size={20} tintColor="#111827" />
           <Text className="text-[17px] font-semibold text-[#111827]">Log out</Text>
         </Pressable>
-
-        {/* Delete account */}
         <Pressable
           onPress={confirmDeleteAccount}
           disabled={isDeleting}
@@ -231,8 +211,6 @@ export default function Profile() {
             </>
           )}
         </Pressable>
-
-        {/* Version */}
         <Text className="mt-6 text-center text-[14px] text-[#B0B7C3]">Triply v1.0.0</Text>
       </ScrollView>
     </View>

@@ -3,7 +3,6 @@ import { db } from "@/db";
 import { assistantMessages } from "@/db/schema";
 import { getAuthUserId, unauthorized } from "@/lib/auth";
 
-// Returns the current user's saved assistant transcript, oldest first.
 export async function GET(request: Request) {
   const auth = await getAuthUserId(request);
   if (!auth.userId) return unauthorized(auth.reason);
@@ -22,7 +21,6 @@ export async function GET(request: Request) {
   return Response.json({ messages: rows });
 }
 
-// Clears the current user's assistant transcript.
 export async function DELETE(request: Request) {
   const auth = await getAuthUserId(request);
   if (!auth.userId) return unauthorized(auth.reason);

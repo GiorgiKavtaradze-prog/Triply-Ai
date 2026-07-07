@@ -5,13 +5,6 @@ import { ASSISTANT_META_SEPARATOR, type AssistantStreamMeta } from "@/lib/assist
 import type { Trip } from "@/db/schema";
 import type { TripStatus } from "@/lib/trip-status";
 
-// Client-side helpers for the Expo Router API routes. In development, relative
-// paths automatically resolve to the dev server origin (Expo Router), so no base
-// URL is needed. Each request carries the Clerk session token as a Bearer header.
-//
-// `getToken` comes from `useAuth().getToken` (Clerk). Keep this file free of any
-// server-only imports so it never pulls secrets into the client bundle.
-
 type GetToken = () => Promise<string | null>;
 
 export class ApiError extends Error {
@@ -29,10 +22,6 @@ async function authedFetch(
   init?: RequestInit,
 ): Promise<Response> {
   const method = init?.method ?? "GET";
-
-  // Wrap every request in an `http.client` span so each API call is a timed,
-  // searchable span in Sentry's Traces UI (nested under whatever action-level
-  // transaction is active, e.g. "Generate trip").
   return Sentry.startSpan(
     {
       name: `${method} ${path}`,
@@ -61,12 +50,7 @@ async function authedFetch(
           const data = (await res.json()) as { error?: string };
           if (data?.error) message = data.error;
         } catch {
-          // non-JSON error body — keep the default message
         }
-
-        // One wide event per failed request so production issues are searchable
-        // by endpoint / status in Sentry's Logs UI. 5xx is a server fault
-        // (error); 4xx is usually a client/validation issue (warn).
         const log = res.status >= 500 ? Sentry.logger.error : Sentry.logger.warn;
         log("API request failed", {
           endpoint: path,
@@ -85,7 +69,7 @@ async function authedFetch(
 
 export type CreateTripInput = {
   destination: string;
-  startDate: string; // YYYY-MM-DD
+  startDate: string;
   numDays: number;
   numTravelers: number;
   budgetTier: "budget" | "comfort" | "luxury";
@@ -93,7 +77,6 @@ export type CreateTripInput = {
   pace: string | null;
 };
 
-// Creates a trip (status `pending`) and kicks off background generation.
 export async function createTrip(
   getToken: GetToken,
   input: CreateTripInput,
@@ -105,20 +88,16 @@ export async function createTrip(
   return res.json();
 }
 
-// Lightweight trip shape returned by the list endpoint (cards only — no itinerary).
 export type TripSummary = Pick<
   Trip,
   "id" | "destination" | "numDays" | "status" | "coverImageUrl" | "budgetBreakdown" | "createdAt"
 >;
 
-// Lists the current user's trips (newest first) for the Trips tab.
 export async function listTrips(getToken: GetToken): Promise<TripSummary[]> {
   const res = await authedFetch(getToken, "/api/trips");
   const data = (await res.json()) as { trips: TripSummary[] };
   return data.trips;
 }
-
-// Polls a trip's generation status.
 export async function getTripStatus(
   getToken: GetToken,
   id: string,
@@ -267,7 +246,7 @@ export async function streamAssistantMessage(
       };
 
       try {
-        for (;;) {
+        for (; ;) {
           const { done, value } = await reader.read();
           if (done) break;
           consume(decoder.decode(value, { stream: true }));

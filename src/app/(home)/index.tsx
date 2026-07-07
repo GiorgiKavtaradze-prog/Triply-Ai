@@ -51,12 +51,9 @@ export default function Home() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: 120 }}
       >
-        {/* Greeting */}
         <Text className="px-6 text-4xl font-extrabold tracking-tight text-[#0F1B2D]">
           Hi, {name} 👋
         </Text>
-
-        {/* AI Trip Planner card */}
         <View className="mx-6 mt-6 overflow-hidden rounded-[28px] bg-[#5B8DEF]">
           <Image
             source={worldImage}
@@ -68,7 +65,6 @@ export default function Home() {
               <SymbolView name="sparkles" size={16} tintColor="#FFFFFF" />
               <Text className="text-[15px] font-semibold text-white">AI Trip Planner</Text>
             </View>
-
             <Text
               numberOfLines={1}
               adjustsFontSizeToFit
@@ -76,11 +72,9 @@ export default function Home() {
             >
               Plan your next trip
             </Text>
-
             <Text className="mt-2 text-[14px] leading-5 text-white/90">
               Tell us where and when — we&apos;ll build the itinerary.
             </Text>
-
             <Pressable
               onPress={() => router.push("/generate-trip")}
               className="mt-5 flex-row items-center gap-2 self-start rounded-full bg-white px-5 py-3"
@@ -90,8 +84,6 @@ export default function Home() {
             </Pressable>
           </View>
         </View>
-
-        {/* Your trips */}
         <View className="mt-8 flex-row items-center justify-between px-6">
           <Text className="text-2xl font-extrabold tracking-tight text-[#0F1B2D]">Your trips</Text>
           <Pressable className="flex-row items-center gap-1">
@@ -99,8 +91,6 @@ export default function Home() {
             <SymbolView name="chevron.right" size={13} tintColor="#2F6BE4" weight="semibold" />
           </Pressable>
         </View>
-
-        {/* Trip card */}
         <View
           className="mx-6 mt-4 overflow-hidden rounded-[24px] bg-white"
           style={{
@@ -121,14 +111,10 @@ export default function Home() {
               colors={["transparent", "rgba(0,0,0,0.55)"]}
               style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 120 }}
             />
-
-            {/* Days badge */}
             <View className="absolute right-3 top-3 flex-row items-center gap-1.5 rounded-full bg-black/45 px-3 py-1.5">
               <SymbolView name="calendar" size={13} tintColor="#FFFFFF" />
               <Text className="text-[13px] font-semibold text-white">3 days</Text>
             </View>
-
-            {/* Title overlay */}
             <View className="absolute bottom-4 left-4">
               <Text className="text-[26px] font-extrabold tracking-tight text-white">
                 3 Days in Osaka
@@ -139,8 +125,6 @@ export default function Home() {
               </View>
             </View>
           </View>
-
-          {/* Footer */}
           <View className="flex-row items-center justify-between px-4 py-3.5">
             <View className="flex-row items-center gap-2">
               <SymbolView name="wallet.bifold" size={17} tintColor="#8A94A6" />
@@ -152,12 +136,9 @@ export default function Home() {
             </Pressable>
           </View>
         </View>
-
-        {/* Popular destinations */}
         <Text className="mt-8 px-6 text-2xl font-extrabold tracking-tight text-[#0F1B2D]">
           Popular destinations
         </Text>
-
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -174,14 +155,10 @@ export default function Home() {
                 colors={["transparent", "rgba(0,0,0,0.5)"]}
                 style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 120 }}
               />
-
-              {/* Rating badge */}
               <View className="absolute right-2.5 top-2.5 flex-row items-center gap-1 rounded-full bg-black/45 px-2.5 py-1">
                 <SymbolView name="star.fill" size={12} tintColor="#F5B942" />
                 <Text className="text-[13px] font-semibold text-white">{dest.rating}</Text>
               </View>
-
-              {/* Name */}
               <View className="absolute bottom-3 left-3">
                 <Text className="text-[19px] font-extrabold tracking-tight text-white">
                   {dest.name}

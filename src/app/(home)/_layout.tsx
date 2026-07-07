@@ -4,11 +4,7 @@ import { NativeTabs } from "expo-router/unstable-native-tabs";
 
 export default function HomeLayout() {
   const { isSignedIn, isLoaded } = useAuth();
-
-  // Wait for the session to restore from the token cache before deciding.
   if (!isLoaded) return null;
-
-  // Gate the protected area behind an active session.
   if (!isSignedIn) return <Redirect href="/sign-in" />;
 
   return (

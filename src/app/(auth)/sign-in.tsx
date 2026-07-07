@@ -14,15 +14,11 @@ export default function SignIn() {
   return (
     <View className="flex-1 bg-black">
       <StatusBar style="light" />
-
-      {/* Background image */}
       <Image
         source={require("../../../assets/images/auth-bg.png")}
         style={StyleSheet.absoluteFill}
         contentFit="cover"
       />
-
-      {/* Dark gradient overlay for legibility */}
       <LinearGradient
         colors={[
           "rgba(8,28,42,0)",
@@ -33,16 +29,11 @@ export default function SignIn() {
         locations={[0, 0.42, 0.72, 1]}
         style={StyleSheet.absoluteFill}
       />
-
-      {/* Content */}
       <View
         className="flex-1 justify-end px-6"
         style={{ paddingBottom: insets.bottom + 24 }}
       >
-        {/* Headline */}
         <Text style={styles.title}>Your next{"\n"}adventure starts here</Text>
-
-        {/* Google button */}
         <Pressable
           style={[styles.whiteButton, styles.firstButton, busy && styles.buttonDisabled]}
           disabled={busy}
@@ -57,8 +48,6 @@ export default function SignIn() {
             </>
           )}
         </Pressable>
-
-        {/* Apple button */}
         <Pressable
           style={[styles.whiteButton, busy && styles.buttonDisabled]}
           disabled={busy}
@@ -73,8 +62,6 @@ export default function SignIn() {
             </>
           )}
         </Pressable>
-
-        {/* Footer */}
         <Text style={styles.footer}>
           By continuing, you agree to our{"\n"}
           <Text style={styles.link}>Terms of Service</Text>
