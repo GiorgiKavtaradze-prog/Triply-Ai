@@ -3,8 +3,7 @@ import { db } from "@/db";
 import { trips } from "@/db/schema";
 import { getAuthUserId, unauthorized } from "@/lib/auth";
 
-// Returns the full trip (itinerary, budget, cover, etc.) for the detail screen,
-// scoped to the authenticated owner.
+
 export async function GET(request: Request, { id }: Record<string, string>) {
   const auth = await getAuthUserId(request);
   if (!auth.userId) return unauthorized(auth.reason);
@@ -22,8 +21,6 @@ export async function GET(request: Request, { id }: Record<string, string>) {
   return Response.json(trip);
 }
 
-// Deletes a trip owned by the authenticated user. Chat messages cascade via the
-// `chat_messages.trip_id` FK (onDelete: "cascade").
 export async function DELETE(request: Request, { id }: Record<string, string>) {
   const auth = await getAuthUserId(request);
   if (!auth.userId) return unauthorized(auth.reason);

@@ -10,8 +10,6 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 import type { BudgetBreakdown, Itinerary } from "@/lib/itinerary";
-
-// Mirrors the relevant Clerk user fields. `id` is the Clerk user id (e.g. "user_abc123").
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
   email: text("email").notNull(),
@@ -23,11 +21,7 @@ export const users = pgTable("users", {
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
-
-// Budget tier the user picks in the form. Values match the AI prompt vocabulary.
 export const budgetTierEnum = pgEnum("budget_tier", ["budget", "comfort", "luxury"]);
-
-// Lifecycle of a trip's generation. `pending` → `generating` → `ready` | `failed`.
 export const tripStatusEnum = pgEnum("trip_status", [
   "pending",
   "generating",
@@ -35,11 +29,7 @@ export const tripStatusEnum = pgEnum("trip_status", [
   "failed",
 ]);
 
-// Chat message author.
 export const chatRoleEnum = pgEnum("chat_role", ["user", "assistant"]);
-
-// One row per generated trip. `itinerary` / `budgetBreakdown` are AI-produced JSON
-// blobs (see `@/lib/itinerary` for their shapes); they're null until status is `ready`.
 export const trips = pgTable("trips", {
   id: text("id").primaryKey(),
   userId: text("user_id")
@@ -50,13 +40,10 @@ export const trips = pgTable("trips", {
   numDays: integer("num_days").notNull(),
   numTravelers: integer("num_travelers").notNull(),
   budgetTier: budgetTierEnum("budget_tier").notNull(),
-  // Interest/style tags picked in the form (e.g. ["Beaches", "Food & drink"]).
   interests: jsonb("interests").$type<string[]>().notNull().default([]),
-  // Travel pace (e.g. "Relaxed"); feeds the prompt, not a hard schema field in the plan.
   pace: text("pace"),
   status: tripStatusEnum("status").notNull().default("pending"),
   coverImageUrl: text("cover_image_url"),
-  // Unsplash attribution for the cover photo (required by Unsplash ToS, see R6).
   coverPhotographer: text("cover_photographer"),
   coverPhotographerUrl: text("cover_photographer_url"),
   itinerary: jsonb("itinerary").$type<Itinerary>(),
@@ -68,8 +55,6 @@ export const trips = pgTable("trips", {
 
 export type Trip = typeof trips.$inferSelect;
 export type NewTrip = typeof trips.$inferInsert;
-
-// Chat transcript used by the "refine" flow (Phase 5). Cascades with its trip.
 export const chatMessages = pgTable("chat_messages", {
   id: text("id").primaryKey(),
   tripId: text("trip_id")
@@ -82,9 +67,6 @@ export const chatMessages = pgTable("chat_messages", {
 
 export type ChatMessage = typeof chatMessages.$inferSelect;
 export type NewChatMessage = typeof chatMessages.$inferInsert;
-
-// Standalone transcript for the AI travel-companion assistant screen. Per-user
-// (not tied to a trip, unlike `chatMessages`) and cascades when the user is deleted.
 export const assistantMessages = pgTable("assistant_messages", {
   id: text("id").primaryKey(),
   userId: text("user_id")
@@ -97,16 +79,12 @@ export const assistantMessages = pgTable("assistant_messages", {
 
 export type AssistantMessageRow = typeof assistantMessages.$inferSelect;
 export type NewAssistantMessageRow = typeof assistantMessages.$inferInsert;
-
-// Per-user, per-day generation counter backing the silent safety cap.
-// Composite PK (userId, day) so each user has at most one row per calendar day.
 export const generationUsage = pgTable(
   "generation_usage",
   {
     userId: text("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    // Calendar day in YYYY-MM-DD (UTC), stored as a date.
     day: date("day").notNull(),
     count: integer("count").notNull().default(0),
   },

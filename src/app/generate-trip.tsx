@@ -142,8 +142,6 @@ export default function GenerateTrip() {
 
     setSubmitting(true);
     try {
-      // Trace the whole "tap Generate → trip created → navigate" action as one
-      // transaction so we can see how long users wait to kick off generation.
       await Sentry.startSpan(
         {
           name: "Generate trip",
@@ -158,8 +156,6 @@ export default function GenerateTrip() {
         },
         async () => {
           const { id } = await createTrip(getToken, input);
-          // One wide event capturing the full request context — lets us slice trip
-          // generations by destination, length, budget tier, etc. in production.
           Sentry.logger.info("Trip generation started", {
             trip_id: id,
             destination: input.destination,
@@ -169,7 +165,6 @@ export default function GenerateTrip() {
             interest_count: input.interests.length,
             pace: input.pace ?? "unset",
           });
-          // Replace so back doesn't return to the form mid-generation.
           router.replace({
             pathname: "/trip-loading",
             params: { id, destination: input.destination, numDays: String(numDays) },
@@ -188,8 +183,6 @@ export default function GenerateTrip() {
   return (
     <View className="flex-1 bg-white">
       <StatusBar style="dark" />
-
-      {/* Header */}
       <View style={{ paddingTop: insets.top + 6 }}>
         <View className="h-12 flex-row items-center justify-center">
           <Pressable
@@ -202,12 +195,10 @@ export default function GenerateTrip() {
           <Text className="text-[20px] font-bold text-[#0F1B2D]">Plan a trip</Text>
         </View>
       </View>
-
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 24 }}
       >
-        {/* AI intro */}
         <View className="flex-row gap-3">
           <View className="h-12 w-12 items-center justify-center rounded-full bg-[#3E7BF0]">
             <SymbolView name="sparkles" size={22} tintColor="#FFFFFF" />
@@ -221,8 +212,6 @@ export default function GenerateTrip() {
             </Text>
           </View>
         </View>
-
-        {/* Where to */}
         <Text className="mt-7 text-[20px] font-bold text-[#0F1B2D]">Where to?</Text>
         <View
           className="mt-3 h-14 flex-row items-center gap-2.5 rounded-2xl border px-4"
@@ -237,16 +226,12 @@ export default function GenerateTrip() {
             className="flex-1 text-[17px] text-[#0F1B2D]"
           />
         </View>
-
-        {/* When */}
         <Text className="mt-7 text-[20px] font-bold text-[#0F1B2D]">When?</Text>
         <View className="mt-3 rounded-[20px] border p-4" style={{ borderColor: BORDER }}>
           <View className="flex-row items-center gap-2.5">
             <SymbolView name="calendar" size={18} tintColor={MUTED} />
             <Text className="text-[17px] text-[#8A94A6]">Select your dates</Text>
           </View>
-
-          {/* Month nav */}
           <View className="mt-4 flex-row items-center justify-between">
             <Pressable
               onPress={goPrev}
@@ -267,8 +252,6 @@ export default function GenerateTrip() {
               <SymbolView name="chevron.right" size={15} tintColor={INK} weight="semibold" />
             </Pressable>
           </View>
-
-          {/* Weekday header */}
           <View className="mt-4 flex-row">
             {WEEKDAYS.map((w, i) => (
               <Text
@@ -280,8 +263,6 @@ export default function GenerateTrip() {
               </Text>
             ))}
           </View>
-
-          {/* Weeks */}
           {weeks.map((week, wi) => (
             <View key={wi} className="mt-1 flex-row">
               {week.map((day, di) => {
@@ -297,7 +278,6 @@ export default function GenerateTrip() {
                   stamp < endStamp;
                 const isEndpoint = isStart || isEnd;
                 const hasRange = startStamp !== null && endStamp !== null && startStamp !== endStamp;
-
                 return (
                   <Pressable
                     key={di}
@@ -305,7 +285,6 @@ export default function GenerateTrip() {
                     disabled={isPast}
                     className="h-11 flex-1 items-center justify-center"
                   >
-                    {/* range band */}
                     {(inRange || (isEndpoint && hasRange)) && (
                       <View
                         className="absolute top-1.5 bottom-1.5"
@@ -316,7 +295,6 @@ export default function GenerateTrip() {
                         }}
                       />
                     )}
-                    {/* endpoint circle */}
                     <View
                       className="h-10 w-10 items-center justify-center rounded-full"
                       style={{ backgroundColor: isEndpoint ? BLUE : "transparent" }}
@@ -343,8 +321,6 @@ export default function GenerateTrip() {
             </View>
           ))}
         </View>
-
-        {/* Budget */}
         <Text className="mt-7 text-[20px] font-bold text-[#0F1B2D]">Budget (per person)</Text>
         <View className="mt-3 flex-row gap-3">
           {BUDGETS.map((b) => {
@@ -369,8 +345,6 @@ export default function GenerateTrip() {
             );
           })}
         </View>
-
-        {/* Travelers */}
         <Text className="mt-7 text-[20px] font-bold text-[#0F1B2D]">Travelers</Text>
         <View
           className="mt-3 h-16 flex-row items-center justify-between rounded-2xl border px-4"
@@ -399,8 +373,6 @@ export default function GenerateTrip() {
             </Pressable>
           </View>
         </View>
-
-        {/* Interests */}
         <Text className="mt-7 text-[20px] font-bold text-[#0F1B2D]">Interests</Text>
         <View className="mt-3 flex-row flex-wrap gap-3">
           {INTERESTS.map((interest) => {
@@ -425,8 +397,6 @@ export default function GenerateTrip() {
             );
           })}
         </View>
-
-        {/* Travel pace */}
         <Text className="mt-7 text-[20px] font-bold text-[#0F1B2D]">Travel pace</Text>
         <View className="mt-3 flex-row gap-3">
           {PACES.map((p) => {
@@ -452,8 +422,6 @@ export default function GenerateTrip() {
           })}
         </View>
       </ScrollView>
-
-      {/* Sticky generate button */}
       <View
         className="border-t px-5 pt-3"
         style={{ borderColor: BORDER, paddingBottom: insets.bottom + 10 }}

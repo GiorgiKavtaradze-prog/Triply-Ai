@@ -20,17 +20,13 @@ const navigationIntegration = Sentry.reactNavigationIntegration({
 Sentry.init({
   dsn: "https://b60bbb4608e5ce41224f239be3b6d627@o4509813037137920.ingest.de.sentry.io/4511651472670800",
 
-  // Adds more context data to events (IP address, cookies, user, etc.)
-  // For more info: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
   sendDefaultPii: true,
 
-  // Capture all traces in development; sample down in production.
   tracesSampleRate: __DEV__ ? 1.0 : 0.2,
 
-  // Capture structured logs and send them to Sentry.
   enableLogs: true,
 
-  // Session Replay: record a sample of sessions, and every session with an error.
+
   replaysSessionSampleRate: __DEV__ ? 0.1 : 0.05,
   replaysOnErrorSampleRate: __DEV__ ? 1.0 : 0.5,
 

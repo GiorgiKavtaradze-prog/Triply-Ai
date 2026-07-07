@@ -68,7 +68,6 @@ export default function TripDetail() {
   const [openDays, setOpenDays] = useState<Record<number, boolean>>({ 1: true });
   const [deleting, setDeleting] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
-  // Local uri shown immediately while the picked image uploads to ImageKit.
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const mapRef = useRef<MapView>(null);
 
@@ -97,7 +96,6 @@ export default function TripDetail() {
     }
   };
 
-  // Native confirmation before the destructive delete.
   const confirmDelete = () => {
     Alert.alert(
       "Delete trip?",
@@ -109,7 +107,6 @@ export default function TripDetail() {
     );
   };
 
-  // Native iOS action sheet triggered by the ••• button.
   const openMenu = () => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
@@ -124,13 +121,9 @@ export default function TripDetail() {
     );
   };
 
-  // Opens the photo library, then uploads the picked image to ImageKit as the new
-  // cover. The picker compresses (quality) and ImageKit optimizes on delivery.
   const changeCover = async () => {
     if (!id || uploadingCover) return;
 
-    // Lazy-loaded so the screen still renders if the native module isn't in the
-    // current dev build yet (it requires a native rebuild: `npm run ios`).
     let ImagePicker: typeof import("expo-image-picker");
     try {
       ImagePicker = await import("expo-image-picker");
@@ -204,7 +197,6 @@ export default function TripDetail() {
   const itinerary = trip.itinerary;
   const budget = trip.budgetBreakdown;
 
-  // Flatten every place across days for the map + sequential numbering.
   const numberedPlaces =
     itinerary?.days.flatMap((d) => d.places).map((p, i) => ({ ...p, n: i + 1 })) ?? [];
 
@@ -212,7 +204,6 @@ export default function TripDetail() {
 
   const title = `${trip.numDays} ${trip.numDays === 1 ? "Day" : "Days"} in ${cityShort(trip.destination)}`;
 
-  // Local preview while uploading, otherwise the ImageKit-optimized remote cover.
   const coverUri = coverPreview ?? optimizedImage(trip.coverImageUrl, 1200);
 
   return (
@@ -223,7 +214,6 @@ export default function TripDetail() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }}
       >
-        {/* ---- Cover ---- */}
         <View style={{ height: insets.top + 252 }}>
           {coverUri ? (
             <Image
@@ -236,21 +226,17 @@ export default function TripDetail() {
             <View className="h-full w-full bg-[#5B8DEF]" />
           )}
 
-          {/* Spinner while a newly picked cover uploads */}
           {uploadingCover ? (
             <View className="absolute inset-0 items-center justify-center bg-black/35">
               <ActivityIndicator color="#FFFFFF" />
             </View>
           ) : null}
 
-          {/* Bottom scrim so the title/attribution stay legible over bright photos */}
           <LinearGradient
             colors={["transparent", "rgba(11,20,34,0.15)", "rgba(11,20,34,0.72)"]}
             locations={[0, 0.45, 1]}
             style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: "68%" }}
           />
-
-          {/* Curved bottom arch (white, blends into page) */}
           <Svg
             width={SCREEN_W}
             height={COVER_ARCH}
@@ -261,8 +247,6 @@ export default function TripDetail() {
               fill="#FFFFFF"
             />
           </Svg>
-
-          {/* Top controls */}
           <Pressable
             onPress={goBack}
             hitSlop={10}
@@ -287,8 +271,6 @@ export default function TripDetail() {
           >
             <SymbolView name="trash" size={20} tintColor="#E5484D" weight="semibold" />
           </Pressable>
-
-          {/* Title block */}
           <View className="absolute left-5 right-5" style={{ bottom: COVER_ARCH + 20 }}>
             <View className="flex-row items-center gap-1.5">
               <SymbolView name="mappin" size={15} tintColor="#FFFFFF" />
@@ -315,8 +297,6 @@ export default function TripDetail() {
             ) : null}
           </View>
         </View>
-
-        {/* ---- Stats ---- */}
         <View className="mt-4 flex-row px-4">
           <StatCol
             icon="calendar"
@@ -331,8 +311,6 @@ export default function TripDetail() {
             sub="/ person"
           />
         </View>
-
-        {/* ---- Map ---- */}
         {numberedPlaces.length > 0 && region ? (
           <>
             <Text className="mt-7 px-5 text-[24px] font-extrabold tracking-tight text-[#0F1B2D]">
@@ -360,8 +338,6 @@ export default function TripDetail() {
                   </Marker>
                 ))}
               </MapView>
-
-              {/* Recenter button */}
               <Pressable
                 onPress={() => region && mapRef.current?.animateToRegion(region, 400)}
                 hitSlop={8}
@@ -378,15 +354,12 @@ export default function TripDetail() {
             </View>
           </>
         ) : null}
-
-        {/* ---- Itinerary ---- */}
         {itinerary?.days.length ? (
           <>
             <Text className="mt-8 px-5 text-[24px] font-extrabold tracking-tight text-[#0F1B2D]">
               Itinerary
             </Text>
             <Text className="mt-1 px-5 text-[16px] text-[#8A94A6]">Your day-by-day plan</Text>
-
             <View className="mt-4 gap-4 px-5">
               {itinerary.days.map((day) => {
                 const open = !!openDays[day.day];
@@ -423,7 +396,6 @@ export default function TripDetail() {
                         weight="semibold"
                       />
                     </Pressable>
-
                     {open ? (
                       <View className="px-4 pb-4">
                         <Text className="text-[15px] leading-6 text-[#5A6472]">{day.summary}</Text>
@@ -459,8 +431,6 @@ export default function TripDetail() {
             </View>
           </>
         ) : null}
-
-        {/* ---- Budget breakdown ---- */}
         {budget ? (
           <>
             <Text className="mt-8 px-5 text-[24px] font-extrabold tracking-tight text-[#0F1B2D]">
@@ -491,8 +461,6 @@ export default function TripDetail() {
             </View>
           </>
         ) : null}
-
-        {/* ---- Hotels ---- */}
         {itinerary?.hotels.length ? (
           <>
             <Text className="mt-8 px-5 text-[24px] font-extrabold tracking-tight text-[#0F1B2D]">
@@ -518,16 +486,12 @@ export default function TripDetail() {
           </>
         ) : null}
       </ScrollView>
-
-      {/* ---- Floating AI assistant ---- */}
       <Pressable
         style={{ bottom: insets.bottom + 18, right: 18 }}
         className="absolute h-16 w-16 items-center justify-center"
       >
         <Image source={aiLogo} style={{ width: 64, height: 64 }} contentFit="contain" />
       </Pressable>
-
-      {/* Blocking overlay while the delete request is in flight */}
       {deleting ? (
         <View className="absolute inset-0 items-center justify-center bg-black/25">
           <View className="h-20 w-20 items-center justify-center rounded-2xl bg-white">

@@ -6,8 +6,6 @@ import { getAuthUserId, unauthorized } from "@/lib/auth";
 import { TRIP_GENERATE, inngest } from "@/inngest/client";
 import { refundGeneration, reserveGeneration, usageDay } from "@/lib/usage";
 
-// Lists the authenticated user's trips for the Trips tab, newest first. Returns
-// only the lightweight fields the cards need (not the full itinerary jsonb).
 export async function GET(request: Request) {
   const auth = await getAuthUserId(request);
   if (!auth.userId) return unauthorized(auth.reason);
@@ -29,8 +27,6 @@ export async function GET(request: Request) {
   return Response.json({ trips: rows });
 }
 
-// Body sent by the generate-trip form. Kept in sync with the client payload in
-// `@/lib/api`. Server-side validation is authoritative regardless of client checks.
 const createTripSchema = z.object({
   destination: z.string().trim().min(1).max(120),
   startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "startDate must be YYYY-MM-DD"),
@@ -61,7 +57,6 @@ export async function POST(request: Request) {
     );
   }
 
-  // Silent safety cap — reserve one generation for today (see PLAN A3).
   const reserved = await reserveGeneration(userId);
   if (!reserved) {
     return Response.json(
@@ -88,14 +83,10 @@ export async function POST(request: Request) {
       status: "pending",
     });
 
-    // Kick off the durable generation pipeline.
     await inngest.send({ name: TRIP_GENERATE, data: { tripId, userId } });
   } catch (error) {
-    // Roll back the reserved quota if we couldn't actually start the job.
-    await refundGeneration(userId, usageDay()).catch(() => {});
-    // Clean up the trip row if it was inserted but the queue start failed, so we
-    // don't leave stale `status: "pending"` data behind. No-op if insert failed.
-    await db.delete(trips).where(eq(trips.id, tripId)).catch(() => {});
+    await refundGeneration(userId, usageDay()).catch(() => { });
+    await db.delete(trips).where(eq(trips.id, tripId)).catch(() => { });
     console.error("[POST /api/trips] failed to create trip:", error);
     return Response.json({ error: "Failed to start trip generation" }, { status: 500 });
   }

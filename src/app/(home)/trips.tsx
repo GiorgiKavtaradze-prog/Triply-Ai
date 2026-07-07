@@ -32,11 +32,7 @@ const CURRENCY_SYMBOL: Record<string, string> = {
 
 const money = (currency: string, amount: number) =>
   `${CURRENCY_SYMBOL[currency] ?? `${currency} `}${Math.round(amount)}`;
-
-// City portion of a destination ("Osaka, Japan" → "Osaka"), used verbatim for the label.
 const cityShort = (destination: string) => destination.split(",")[0].trim();
-
-// Title-cased city for the card headline ("cappadocia" → "Cappadocia").
 const titleCase = (value: string) =>
   value.replace(/\b\w/g, (c) => c.toUpperCase());
 
@@ -66,16 +62,12 @@ function TripCard({ trip, onPress }: { trip: TripSummary; onPress: () => void })
           colors={["transparent", "rgba(0,0,0,0.55)"]}
           style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 120 }}
         />
-
-        {/* Days badge */}
         <View className="absolute right-3 top-3 flex-row items-center gap-1.5 rounded-full bg-black/45 px-3 py-1.5">
           <SymbolView name="calendar" size={13} tintColor="#FFFFFF" />
           <Text className="text-[13px] font-semibold text-white">
             {trip.numDays} {trip.numDays === 1 ? "day" : "days"}
           </Text>
         </View>
-
-        {/* Title overlay */}
         <View className="absolute bottom-4 left-4">
           <Text className="text-[26px] font-extrabold tracking-tight text-white">{title}</Text>
           <View className="mt-0.5 flex-row items-center gap-1">
@@ -84,8 +76,6 @@ function TripCard({ trip, onPress }: { trip: TripSummary; onPress: () => void })
           </View>
         </View>
       </View>
-
-      {/* Footer */}
       <View className="flex-row items-center justify-between px-4 py-3.5">
         <View className="flex-row items-center gap-2">
           <SymbolView name="wallet.bifold" size={17} tintColor={MUTED} />
@@ -152,7 +142,6 @@ export default function Trips() {
         contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: 120 }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
-        {/* Header */}
         <Text className="px-6 text-4xl font-extrabold tracking-tight text-[#0F1B2D]">Trips</Text>
         <Text className="mt-1 px-6 text-[16px] font-medium text-[#8A94A6]">{subtitle}</Text>
 
@@ -161,7 +150,6 @@ export default function Trips() {
             <ActivityIndicator color={INK} />
           </View>
         ) : null}
-
         {error ? (
           <View className="mt-24 items-center px-10">
             <Text className="text-center text-[15px] font-medium text-[#8A94A6]">{error}</Text>
@@ -173,7 +161,6 @@ export default function Trips() {
             </Pressable>
           </View>
         ) : null}
-
         {trips && trips.length === 0 && !error ? (
           <View className="mt-24 items-center px-10">
             <SymbolView name="map" size={44} tintColor="#C7CDD8" />

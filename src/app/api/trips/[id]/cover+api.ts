@@ -5,16 +5,12 @@ import { trips } from "@/db/schema";
 import { getAuthUserId, unauthorized } from "@/lib/auth";
 import { uploadTripCover } from "@/lib/images";
 
-// ~10MB decoded cap (base64 is ~4/3 the byte size). The client already compresses via
-// the image picker, so this is just an abuse guard.
 const MAX_BASE64_LENGTH = Math.ceil((10 * 1024 * 1024 * 4) / 3);
 
 const bodySchema = z.object({
   imageBase64: z.string().min(1).max(MAX_BASE64_LENGTH, "Image is too large"),
 });
 
-// Replaces a trip's cover image with a user-picked photo, optimized/hosted via
-// ImageKit. Clears the Unsplash attribution since the cover is now the user's own.
 export async function PATCH(request: Request, { id }: Record<string, string>) {
   const auth = await getAuthUserId(request);
   if (!auth.userId) return unauthorized(auth.reason);
@@ -32,7 +28,6 @@ export async function PATCH(request: Request, { id }: Record<string, string>) {
     return Response.json({ error: parsed.error.issues[0]?.message ?? "Invalid request" }, { status: 400 });
   }
 
-  // Ensure the trip exists and belongs to the caller before doing any upload work.
   const [trip] = await db
     .select({ id: trips.id })
     .from(trips)
@@ -60,8 +55,7 @@ export async function PATCH(request: Request, { id }: Record<string, string>) {
     })
     .where(and(eq(trips.id, id), eq(trips.userId, userId)))
     .returning({ id: trips.id });
-
-  // The trip may have been deleted between the existence check and this update.
+    
   if (updated.length === 0) {
     return Response.json({ error: "Trip not found" }, { status: 404 });
   }
