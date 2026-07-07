@@ -1,13 +1,24 @@
 <h1 align="center">✈️ Triply — AI Trip Planner</h1>
 
-<p align="center">
-  <a href="https://apps.apple.com/app/triply-ai-trip-planner/id6744444444">
-    <img alt="Get it on the App Store" src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" width="140" />
-  </a>
-  <a href="https://play.google.com/store/apps/details?id=com.burakorkmez.triply">
-    <img alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" width="140" />
-  </a>
-</p>
+## 🛠️ Tech Stack
+
+| Category | Technology |
+|----------|------------|
+| **Framework** | <img src="https://img.shields.io/badge/Expo-SDK%2056-000000?style=for-the-badge&logo=expo&logoColor=white" alt="Expo SDK 56" /> |
+| **Runtime** | <img src="https://img.shields.io/badge/React%20Native-0.85.3-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React Native 0.85.3" /> |
+| **Library** | <img src="https://img.shields.io/badge/React-19.2.3-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React 19.2.3" /> |
+| **Language** | <img src="https://img.shields.io/badge/TypeScript-~6.0.3-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" /> |
+| **Routing** | <img src="https://img.shields.io/badge/Expo%20Router-~56.2.11-000000?style=for-the-badge&logo=expo&logoColor=white" alt="Expo Router" /> |
+| **Styling** | <img src="https://img.shields.io/badge/NativeWind-v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="NativeWind v4" /> |
+| **Database** | <img src="https://img.shields.io/badge/PostgreSQL-Neon-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL + Neon" /> |
+| **ORM** | <img src="https://img.shields.io/badge/Drizzle-^0.45.2-2D3748?style=for-the-badge&logo=drizzle&logoColor=white" alt="Drizzle ORM" /> |
+| **Auth** | <img src="https://img.shields.io/badge/Clerk-^3.6.3-6E56CF?style=for-the-badge&logo=clerk&logoColor=white" alt="Clerk" /> |
+| **AI** | <img src="https://img.shields.io/badge/OpenAI-^6.45.0-412991?style=for-the-badge&logo=openai&logoColor=white" alt="OpenAI" /> |
+| **Background Jobs** | <img src="https://img.shields.io/badge/Inngest-^4.11.0-000000?style=for-the-badge&logo=inngest&logoColor=white" alt="Inngest" /> |
+| **Images** | <img src="https://img.shields.io/badge/ImageKit-^6.0.0-000000?style=for-the-badge&logo=imagekit&logoColor=white" alt="ImageKit" /> |
+| **Monitoring** | <img src="https://img.shields.io/badge/Sentry-~7.11.0-362D59?style=for-the-badge&logo=sentry&logoColor=white" alt="Sentry" />
+
+---
 
 <p align="center">
   <a href="https://github.com/GiorgiKavtaradze-prog/TriplyAi/stargazers">
@@ -88,26 +99,6 @@ The application features secure authentication via Clerk, real-time AI trip gene
 - 🖼️ **ImageKit** — Image optimization & delivery
 - 🐞 **Sentry** — Error tracking & monitoring
 - 📄 **Legal Pages** — Privacy, Terms, Support
-
----
-
-## 🛠️ Tech Stack
-
-| Category | Technology | Version |
-|----------|------------|---------|
-| **Framework** | [Expo](https://expo.dev) | SDK 56 |
-| **Runtime** | [React Native](https://reactnative.dev) | 0.85.3 |
-| **Library** | [React](https://react.dev) | 19.2.3 |
-| **Language** | [TypeScript](https://typescriptlang.org) | ~6.0.3 |
-| **Routing** | [Expo Router](https://docs.expo.dev/router) | ~56.2.11 |
-| **Styling** | [NativeWind](https://www.nativewind.dev) | v4 |
-| **Database** | [PostgreSQL](https://postgresql.org) + [Neon](https://neon.tech) | - |
-| **ORM** | [Drizzle](https://orm.drizzle.team) | ^0.45.2 |
-| **Auth** | [Clerk](https://clerk.com) | ^3.6.3 |
-| **AI** | [OpenAI](https://openai.com) | ^6.45.0 |
-| **Background Jobs** | [Inngest](https://inngest.com) | ^4.11.0 |
-| **Images** | [ImageKit](https://imagekit.io) | ^6.0.0 |
-| **Monitoring** | [Sentry](https://sentry.io) | ~7.11.0 |
 
 ---
 
