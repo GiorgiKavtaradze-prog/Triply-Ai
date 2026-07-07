@@ -10,9 +10,6 @@ import {
   type TripGeneration,
 } from "./itinerary";
 
-// The models we run trip generation on. Both support Structured Outputs. Which one a
-// given run uses is decided by an Inngest experiment (see `generateTrip`), so the model
-// is threaded in as a parameter rather than hardcoded here.
 export type TripPlanModel = "gpt-4o-mini" | "gpt-4o";
 
 let client: OpenAI | null = null;
@@ -23,7 +20,7 @@ function getClient(): OpenAI {
 
 export type TripPlanInput = {
   destination: string;
-  startDate: string; // YYYY-MM-DD
+  startDate: string;
   numDays: number;
   numTravelers: number;
   budgetTier: "budget" | "comfort" | "luxury";
@@ -37,7 +34,6 @@ const BUDGET_GUIDANCE: Record<TripPlanInput["budgetTier"], string> = {
   luxury: "luxury: 4-5 star hotels and standout stays, fine dining, premium experiences and private tours",
 };
 
-// Trip-level details that aren't day-specific (returned by a single call).
 const tripMetaSchema = z.object({
   summary: z.string(),
   hotels: z.array(hotelSchema),
@@ -45,15 +41,12 @@ const tripMetaSchema = z.object({
 });
 type TripMeta = z.infer<typeof tripMetaSchema>;
 
-// Returns "YYYY-MM-DD" for `startDate` (YYYY-MM-DD) plus `offset` days. Parsed as
-// UTC so the date arithmetic never shifts across a DST/timezone boundary.
 function addDays(startDate: string, offset: number): string {
   const d = new Date(`${startDate}T00:00:00Z`);
   d.setUTCDate(d.getUTCDate() + offset);
   return d.toISOString().slice(0, 10);
 }
 
-// Shared trip context lines reused across the per-day and meta prompts.
 function contextLines(input: TripPlanInput): string {
   const interestLine = input.interests.length ? input.interests.join(", ") : "general sightseeing";
   const paceLine = input.pace ? `${input.pace} pace` : "a balanced pace";
@@ -66,10 +59,6 @@ function contextLines(input: TripPlanInput): string {
   ].join("\n");
 }
 
-// Generates ONE day of the itinerary. We generate day-by-day (rather than asking for
-// all N days in a single call) because mini models unreliably honor the requested day
-// count for a deeply nested schema — a single-day request is always respected, so the
-// caller controls the total count exactly.
 async function generateDay(
   input: TripPlanInput,
   model: TripPlanModel,
@@ -115,7 +104,6 @@ async function generateDay(
   return daySchema.parse(message.parsed);
 }
 
-// Generates the trip-level summary, hotel suggestions and budget breakdown.
 async function generateMeta(input: TripPlanInput, model: TripPlanModel): Promise<TripMeta> {
   const system = [
     "You are an expert travel planner.",
@@ -140,9 +128,6 @@ async function generateMeta(input: TripPlanInput, model: TripPlanModel): Promise
 
   const meta = tripMetaSchema.parse(message.parsed);
 
-  // The model reports `totalPerPerson` separately from the per-category amounts and
-  // the two don't always agree. Derive the total from the categories so the exposed
-  // budget is always internally consistent.
   meta.budgetBreakdown.totalPerPerson = meta.budgetBreakdown.categories.reduce(
     (sum, category) => sum + category.amountPerPerson,
     0,
@@ -151,9 +136,6 @@ async function generateMeta(input: TripPlanInput, model: TripPlanModel): Promise
   return meta;
 }
 
-// Produces a validated itinerary + budget breakdown for the trip. The trip meta and
-// the per-day plans are generated as separate calls: meta runs concurrently while the
-// days are generated sequentially so each day can avoid places used on earlier days.
 export async function generateTripPlan(
   input: TripPlanInput,
   model: TripPlanModel = "gpt-4o-mini",
@@ -167,7 +149,6 @@ export async function generateTripPlan(
   const usedTitles: string[] = [];
   for (let i = 0; i < numDays; i++) {
     const day = await generateDay(input, model, i + 1, addDays(startDate, i), usedPlaces, usedTitles);
-    // Enforce sequential numbering regardless of what the model returned.
     day.day = i + 1;
     days.push(day);
     usedPlaces.push(...day.places.map((p) => p.name));
@@ -176,7 +157,6 @@ export async function generateTripPlan(
 
   const meta = await metaPromise;
 
-  // Guaranteed by the loop, but assert to catch any future regression.
   if (days.length !== numDays) {
     throw new Error(`Built ${days.length} day(s) but ${numDays} were requested for ${destination}.`);
   }

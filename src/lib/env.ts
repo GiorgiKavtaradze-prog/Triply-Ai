@@ -1,10 +1,3 @@
-// Typed access to server-side env vars used by API routes / Inngest functions.
-// Throws early with a clear message instead of failing deep inside an SDK call.
-// NOTE: only import this from server code (`+api.ts`, `src/inngest/*`), never from
-// screens — these secrets must not be bundled into the client.
-
-// Static `process.env.X` access is required (Expo inlines env vars at build time and
-// lints against dynamic access), so each var is read explicitly here.
 function required(name: string, value: string | undefined): string {
   if (!value) {
     throw new Error(`Missing required env var: ${name}. Add it to your .env file.`);

@@ -106,13 +106,11 @@ export async function getTripStatus(
   return res.json();
 }
 
-// Fetches the full trip for the detail screen.
 export async function getTrip(getToken: GetToken, id: string): Promise<Trip> {
   const res = await authedFetch(getToken, `/api/trips/${id}`);
   return res.json();
 }
 
-// Deletes a trip (and its chat messages, via cascade).
 export async function deleteTrip(getToken: GetToken, id: string): Promise<void> {
   await authedFetch(getToken, `/api/trips/${id}`, { method: "DELETE" });
 }
@@ -122,14 +120,10 @@ export type AssistantMessage = {
   content: string;
 };
 
-// Identifies the assistant to Sentry's AI Agent Monitoring dashboards.
 const ASSISTANT_AGENT_NAME = "Travel Companion";
 const ASSISTANT_MODEL = "gpt-4o-mini";
 const ASSISTANT_PROVIDER = "openai";
 
-// Resolves an app-relative API path to an absolute URL. `expo/fetch` (unlike the
-// global fetch, which Expo Router patches) does not resolve relative paths, so we
-// prepend the dev/prod origin that `@expo/metro-runtime` installs on `location`.
 function apiUrl(path: string): string {
   const origin =
     (globalThis as { location?: { origin?: string } }).location?.origin ??
@@ -137,7 +131,6 @@ function apiUrl(path: string): string {
   return origin ? new URL(path, origin).toString() : path;
 }
 
-// Shapes the conversation into Sentry's `gen_ai` message format (role + typed parts).
 function toGenAiMessages(messages: AssistantMessage[]) {
   return messages.map((m) => ({
     role: m.role,
@@ -145,7 +138,6 @@ function toGenAiMessages(messages: AssistantMessage[]) {
   }));
 }
 
-// Applies the metadata trailer (token usage + concrete model) to the agent span.
 function applyStreamMeta(span: Sentry.Span, meta: AssistantStreamMeta) {
   if (meta.model) span.setAttribute("gen_ai.response.model", meta.model);
   const u = meta.usage;
@@ -161,14 +153,6 @@ function applyStreamMeta(span: Sentry.Span, meta: AssistantStreamMeta) {
   }
 }
 
-// Streams the assistant's reply for the running conversation, invoking `onDelta`
-// with each text chunk as it arrives. Uses `expo/fetch` because React Native's
-// global fetch buffers the whole body and can't expose a readable stream.
-//
-// The call is wrapped in a `gen_ai.invoke_agent` span so it shows up in Sentry's
-// AI Agent Monitoring dashboards (manual instrumentation — the automatic OpenAI
-// integration isn't available on React Native). Token usage and the concrete model
-// arrive in the stream's trailing metadata frame (see `@/lib/assistant-stream`).
 export async function streamAssistantMessage(
   getToken: GetToken,
   messages: AssistantMessage[],
@@ -205,7 +189,6 @@ export async function streamAssistantMessage(
           const data = (await res.json()) as { error?: string };
           if (data?.error) message = data.error;
         } catch {
-          // non-JSON error body — keep the default message
         }
         Sentry.logger.warn("Assistant stream failed", { status: res.status, message });
         throw new ApiError(message, res.status);
@@ -214,9 +197,6 @@ export async function streamAssistantMessage(
       const reader = res.body?.getReader();
       if (!reader) throw new ApiError("The assistant returned no response stream", 502);
 
-      // The body is the reply text, then ASSISTANT_META_SEPARATOR, then a JSON
-      // metadata frame. Emit everything before the separator as reply text and
-      // buffer everything after it as metadata.
       const decoder = new TextDecoder();
       let reply = "";
       let metaJson = "";
@@ -265,7 +245,6 @@ export async function streamAssistantMessage(
         try {
           applyStreamMeta(span, JSON.parse(metaJson) as AssistantStreamMeta);
         } catch {
-          // malformed trailer — reply text is unaffected, just skip the metadata
         }
       }
     },
@@ -279,7 +258,6 @@ export type StoredAssistantMessage = {
   createdAt: string;
 };
 
-// Loads the current user's saved assistant transcript (oldest first).
 export async function getAssistantMessages(
   getToken: GetToken,
 ): Promise<StoredAssistantMessage[]> {
@@ -288,13 +266,10 @@ export async function getAssistantMessages(
   return data.messages;
 }
 
-// Deletes the current user's entire assistant transcript.
 export async function clearAssistantMessages(getToken: GetToken): Promise<void> {
   await authedFetch(getToken, "/api/assistant/messages", { method: "DELETE" });
 }
 
-// Replaces a trip's cover image with a user-picked photo (raw base64). Returns the
-// new ImageKit-hosted URL.
 export async function updateTripCover(
   getToken: GetToken,
   id: string,
