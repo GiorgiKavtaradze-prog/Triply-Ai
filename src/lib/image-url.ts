@@ -1,9 +1,3 @@
-// Client-safe helpers for building optimized ImageKit delivery URLs. Kept free of any
-// server imports (the ImageKit SDK / secrets live in `@/lib/images`).
-
-// Appends ImageKit delivery transformations so images are served resized, compressed
-// and in an optimal format instead of at their original (potentially huge) size.
-// Non-ImageKit URLs are returned unchanged.
 export function optimizedImage(
   url: string | null | undefined,
   width = 1200,
