@@ -25,7 +25,7 @@
 </p>
 
 <p align="center">
-  <img src="design/app-ui-design-inspiration.png" alt="Triply App Screenshots" width="100%" />
+  <img src="assets/images/screenshot-for-readme.png" alt="Triply App Screenshots" width="100%" />
 </p>
 
 ---
